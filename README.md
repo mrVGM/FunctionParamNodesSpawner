@@ -23,3 +23,7 @@ ActivationSequence="arg"
 The code above will set the activation sequence to 'arg'. So all of the 'A', 'R' and 'G' keys need to be clicked in a row, followed by a left-mouse click, in order to generate the input nodes.
 
 Installing the plugin is as simple as cloning this repository into the _Plugins_ folder of you project. I developed it using UE 5.2, but it should be working with newer versions of Unreal, too.
+
+Here is a demo:
+
+![](https://mrvgm.github.io/misc/FunctionParamNodesSpawner.gif)
