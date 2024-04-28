@@ -1,32 +1,28 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EditorUtilityObject.h"
+#include "UObject/Object.h"
 #include "EdFunctionParamNodesSpawner.generated.h"
 
-/**
- * 
- */
-UCLASS(Blueprintable)
-class UEdFunctionParamNodesSpawner : public UEditorUtilityObject
+UCLASS(Config=Editor)
+class UEdFunctionParamNodesSpawner : public UObject
 {
 	GENERATED_BODY()
 
 private:
+	UPROPERTY(Config)
+	FString ActivationSequence = "a";
+	uint32 ActivationProgress = 0;
+
+	FDelegateHandle MouseDownHandle;
+	FDelegateHandle KeyDownHandle;
+
+	bool ShouldSpawnParamNodes();
+	void ResetSpawnParamNodesConditions();
+
 	void GenerateFuncParamNodes(UBlueprint const* const Blueprint, UEdGraph* graph, const FVector2D& location);
 
 public:
-	UFUNCTION(BlueprintCallable)
 	void StartListeningForInput();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnKeyDown(const FKey& key);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	bool ShouldSpawnParamNodes();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ResetSpawnParamNodesConditions();
+	void StopListeningForInput();
 };

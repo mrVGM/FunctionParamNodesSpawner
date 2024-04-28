@@ -39,11 +39,26 @@ void UEdFunctionParamNodesSpawner::StartListeningForInput()
 {
 	FSlateApplication* slateApp = &FSlateApplication::Get();
 
-	slateApp->OnApplicationPreInputKeyDownListener().AddLambda([this](const FKeyEvent& keyEvent) {
-		OnKeyDown(keyEvent.GetKey());
+	KeyDownHandle = slateApp->OnApplicationPreInputKeyDownListener().AddLambda([this](const FKeyEvent& keyEvent) {
+		if (ActivationSequence.Len() == 0 || ActivationProgress == ActivationSequence.Len())
+		{
+			ActivationProgress = 0;
+			return;
+		}
+
+		FString next = FString::Chr(ActivationSequence[ActivationProgress]).ToUpper();
+		FString keyName = keyEvent.GetKey().GetFName().ToString();
+
+		if (keyName.Equals(next))
+		{
+			++ActivationProgress;
+			return;
+		}
+
+		ActivationProgress = 0;
 	});
 
-	slateApp->OnApplicationMousePreInputButtonDownListener().AddLambda([this, slateApp](const FPointerEvent& pointerEvent) {
+	MouseDownHandle = slateApp->OnApplicationMousePreInputButtonDownListener().AddLambda([this, slateApp](const FPointerEvent& pointerEvent) {
 		bool shouldSpawnParams = ShouldSpawnParamNodes();
 		ResetSpawnParamNodesConditions();
 
@@ -101,4 +116,25 @@ void UEdFunctionParamNodesSpawner::StartListeningForInput()
 			GenerateFuncParamNodes(bp, edGraph, graphEditor->GetPasteLocation());
 		}
 	});
+}
+
+void UEdFunctionParamNodesSpawner::StopListeningForInput()
+{
+	if (FSlateApplication::IsInitialized())
+	{
+		FSlateApplication& slateApp = FSlateApplication::Get();
+		slateApp.OnApplicationPreInputKeyDownListener().Remove(KeyDownHandle);
+		slateApp.OnApplicationMousePreInputButtonDownListener().Remove(MouseDownHandle);
+	}
+}
+
+
+bool UEdFunctionParamNodesSpawner::ShouldSpawnParamNodes()
+{
+	return ActivationSequence.Len() > 0 && ActivationProgress == ActivationSequence.Len();
+}
+
+void UEdFunctionParamNodesSpawner::ResetSpawnParamNodesConditions()
+{
+	ActivationProgress = 0;
 }

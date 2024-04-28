@@ -2,10 +2,28 @@
 
 #include "FunctionParamNodesSpawner.h"
 
+#include "EdFunctionParamNodesSpawner.h"
+
 #define LOCTEXT_NAMESPACE "FFunctionParamNodesSpawnerModule"
 
 void FFunctionParamNodesSpawnerModule::StartupModule()
 {
+	if (!FSlateApplication::IsInitialized())
+	{
+		return;
+	}
+
+	static UEdFunctionParamNodesSpawner* spawner = nullptr;
+
+	if (!spawner)
+	{
+		spawner = NewObject<UEdFunctionParamNodesSpawner>();
+
+		// This object will live as long as the editor does
+		spawner->AddToRoot();
+		spawner->StartListeningForInput();
+	}
+
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
